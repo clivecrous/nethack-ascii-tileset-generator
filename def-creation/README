@@ -1,0 +1,2 @@
+- requires any tile-based build, or "tiles.o" added to list of objects for tty build.
+- setup chars/colous as required within .nethackrc
