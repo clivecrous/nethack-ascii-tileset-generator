@@ -1,0 +1,90 @@
+diff -Prub slashem-0.0.7E6F1/src/allmain.c slashem-0.0.7E6F1-nhtt/src/allmain.c
+--- slashem-0.0.7E6F1/src/allmain.c	2004-03-20 14:00:50.000000000 +0200
++++ slashem-0.0.7E6F1-nhtt/src/allmain.c	2004-03-23 14:21:35.000000000 +0200
+@@ -533,6 +533,77 @@
+     display_nhwindow(WIN_MAP, FALSE);
+ }
+ 
++extern short glyph2tile[MAX_GLYPH];
++extern int total_tiles_used;
++void
++exportnethacktexttiledef()
++{
++    int tile2glyph[MAX_GLYPH];
++    int counter;
++    FILE *exportfile;
++    d_level fakelevel;
++
++        int ocolor,ochar;
++    unsigned ospecial;
++
++    for(counter=0;counter<total_tiles_used;counter++)
++        tile2glyph[counter]=MAX_GLYPH;
++
++    /* Sokoban */
++
++    fakelevel.dnum = sokoban_dnum;
++    substitute_tiles(&fakelevel);
++
++    for(counter=0;counter<MAX_GLYPH;counter++)
++        tile2glyph[glyph2tile[counter]]=counter;
++
++    /* Mines */
++
++    fakelevel.dnum = mines_dnum;
++    substitute_tiles(&fakelevel);
++
++    for(counter=0;counter<MAX_GLYPH;counter++)
++        tile2glyph[glyph2tile[counter]]=counter;
++
++    /* Hell */
++
++    for (counter=0;;counter++) {
++	if (dungeons[counter].flags.hellish) break;
++    }
++    fakelevel.dnum = counter;
++
++    substitute_tiles(&fakelevel);
++
++    for(counter=0;counter<MAX_GLYPH;counter++)
++        tile2glyph[glyph2tile[counter]]=counter;
++
++    /* Knox */
++
++    fakelevel = knox_level;
++    substitute_tiles(&fakelevel);
++
++    for(counter=0;counter<MAX_GLYPH;counter++)
++        tile2glyph[glyph2tile[counter]]=counter;
++
++    /* Normal */
++
++    substitute_tiles(&u.uz);
++
++    for(counter=0;counter<MAX_GLYPH;counter++)
++        tile2glyph[glyph2tile[counter]]=counter;
++
++    exportfile=fopen("nhtexttile.def","w");
++    if (!exportfile) return;
++
++    for (counter=0;counter<total_tiles_used;counter++) {
++        mapglyph(tile2glyph[counter], &ochar, &ocolor, &ospecial, 0, 0);
++        fprintf(exportfile,"%c%x",
++            ochar, ocolor);
++    }
++
++    fclose(exportfile);
++}
++
+ void
+ newgame()
+ {
+@@ -597,6 +668,8 @@
+ #endif
+ 	program_state.something_worth_saving++;	/* useful data now exists */
+ 
++	exportnethacktexttiledef();
++
+ 	/* Success! */
+ 	welcome(TRUE);
+ 	return;
