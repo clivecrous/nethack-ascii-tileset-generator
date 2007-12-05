@@ -360,8 +360,11 @@ render_tile(x,y,ch,colour)
 {
     SDL_Surface *ch_sur;
     SDL_Rect srcrect,dstrect;
+    char rend_ch[2];
 
-    ch_sur=TTF_RenderGlyph_Blended(font,ch,colour_lookup[colour]);
+    rend_ch[0]=ch;
+    rend_ch[1]=0;
+    ch_sur=TTF_RenderText_Blended(font,(char *)&rend_ch,colour_lookup[colour]);
     if (filename_bgd||(!is_alpha)) {
         SDL_SetAlpha(ch_sur,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
     } else {
